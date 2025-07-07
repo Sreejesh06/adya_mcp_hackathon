@@ -57,6 +57,14 @@ export async function ClientAndServerValidation(payload:any, streaming_callback:
         }
         client_details["tools"] = tools_arr;
 
+        // Debug logging for tools
+        console.log("🔍 DEBUG: Total tools loaded:", tools_arr.length);
+        console.log("🔍 DEBUG: Tool names:", tools_arr.map(t => t.function.name));
+        if (selected_servers.includes("WAYBACK")) {
+            const waybackTools = tools_arr.filter(t => t.function.name.includes("snapshot") || t.function.name.includes("archived"));
+            console.log("🔍 DEBUG: WAYBACK snapshot tools:", waybackTools.map(t => t.function.name));
+        }
+
 
         
         return {

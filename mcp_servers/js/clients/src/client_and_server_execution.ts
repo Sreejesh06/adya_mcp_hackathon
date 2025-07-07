@@ -77,15 +77,28 @@ export async function ClientAndServerExecution(payload:any, streaming_callback:a
         }
 
         var tools_getting_agent_prompt = `
-        You are an ${selected_server} AI assistant that analyzes user requests and determines the require tool calls from available tools.
+        You are an ${selected_server} AI assistant that analyzes user requests and determines if they require tool calls from available tools.
         Available tools: ${JSON.stringify(tool_call_details_arr)}
-        Analyze each request to determine if it matches available tool capabilities or needs clarification.
-        Return TRUE for tool calls when the request clearly maps to available tools without checking the required parameters.
-        Return FALSE when the request is ambiguous, missing parameters, or requires more information.
-        Output format:
+        
+        IMPORTANT: The ${selected_server} server is SPECIFICALLY DESIGNED to handle these types of requests. When users ask for web archiving, snapshot retrieval, or Wayback Machine operations, you should ALWAYS return TRUE and select the appropriate tools.
+
+        Common request patterns that should return TRUE:
+        - "get first archived snapshot" → get_first_archived_snapshot
+        - "get snapshots" or "find snapshots" → get-wayback-snapshots
+        - "list snapshot dates" → list_snapshot_dates
+        - "search wayback history" → search-wayback-history
+        - "save page now" or "archive this URL" → save-page-now
+        - "get latest snapshot" → get_latest_snapshot
+        - "check if archived" → check_if_archived
+        - Any mention of "wayback", "archive", "snapshot", "historical version"
+
+        Return TRUE for tool calls when the request clearly relates to web archiving or snapshot retrieval.
+        Return FALSE only when the request is completely unrelated to ${selected_server} capabilities.
+        
+        Output format (MUST be exact):
             <function_call>TRUE/FALSE</function_call>
             <selected_tools>function_name1,function_name2 or "none"</selected_tools>
-        Use exact tool names from available tools. List all relevant tools ordered by relevance.The output format should be exactly the same as mentioned above.It should be in string
+        Use exact tool names from available tools. When in doubt, choose TRUE and the most relevant tool.
         `;
 
 
@@ -110,6 +123,10 @@ export async function ClientAndServerExecution(payload:any, streaming_callback:a
                 return ClientAndServerExecution
             }
             var extractedResult = extractDataFromResponse(initialLlmResponse.Data?.messages?.[0] || "");
+            
+            // Debug logging for Azure AI tool decision
+            console.log("🔍 DEBUG (Azure AI): Tool decision:", extractedResult);
+            console.log("🔍 DEBUG (Azure AI): LLM response:", initialLlmResponse.Data?.messages?.[0] || "");
             
 
             ClientAndServerExecution.Data.total_llm_calls += 1;
@@ -316,6 +333,10 @@ export async function ClientAndServerExecution(payload:any, streaming_callback:a
                 return ClientAndServerExecution
             }
             var extractedResult = extractDataFromResponse(initialLlmResponse.Data?.messages?.[0] || "");
+            
+            // Debug logging for Gemini tool decision
+            console.log("🔍 DEBUG (Gemini): Tool decision:", extractedResult);
+            console.log("🔍 DEBUG (Gemini): LLM response:", initialLlmResponse.Data?.messages?.[0] || "");
 
             ClientAndServerExecution.Data.total_llm_calls += 1;
             ClientAndServerExecution.Data.total_tokens += initialLlmResponse.Data?.total_tokens || 0;

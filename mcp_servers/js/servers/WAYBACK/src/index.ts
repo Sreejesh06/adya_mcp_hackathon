@@ -199,16 +199,25 @@ console.log("✅ Wayback Machine MCP Server initialized");
 
 // ================ WAYBACK MACHINE TOOLS ================
 
+// Helper function to normalize URLs
+function normalizeUrl(url: string): string {
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return 'https://' + url;
+  }
+  return url;
+}
+
 server.tool(
   "get-wayback-snapshots",
   "Fetches available snapshots from the Wayback Machine for a given URL",
   {
-    url: z.string().url().describe("The URL to look up in the Wayback Machine"),
+    url: z.string().describe("The URL to look up in the Wayback Machine (with or without https://)"),
     timestamp: z.string().optional().describe("Specific timestamp (flexible format: 'Jan 1 2025', '2021', 'YYYYMMDD', 'YYYY-MM-DD', 'MM/DD/YYYY', 'January 2025', 'today', etc.)"),
   },
   async ({ url, timestamp }) => {
     try {
-      const params: Record<string, any> = { url };
+      const normalizedUrl = normalizeUrl(url);
+      const params: Record<string, any> = { url: normalizedUrl };
       if (timestamp) {
         const parsedTimestamp = parseFlexibleDate(timestamp);
         if (parsedTimestamp) params.timestamp = parsedTimestamp;
@@ -242,19 +251,17 @@ server.tool(
         snapshot.timestamp.substr(8, 2) + ':' + 
         snapshot.timestamp.substr(10, 2) + ':' + 
         snapshot.timestamp.substr(12, 2) + 'Z'
-      ).toISOString();
-
-      return {
-        content: [{
-          type: "text",
-          text: `📸 Wayback Machine Snapshot Found:\n\n` +
-            `🔗 Original URL: ${url}\n` +
-            `📅 Snapshot Date: ${formattedDate}\n` +
-            `🌐 Archived URL: ${snapshot.url}\n` +
-            `📊 Status: ${snapshot.status}\n` +
-            `✅ Available: ${snapshot.available ? 'Yes' : 'No'}`
-        }]
-      };
+      ).toISOString();        return {
+          content: [{
+            type: "text",
+            text: `📸 Wayback Machine Snapshot Found:\n\n` +
+              `🔗 Original URL: ${normalizedUrl}\n` +
+              `📅 Snapshot Date: ${formattedDate}\n` +
+              `🌐 Archived URL: ${snapshot.url}\n` +
+              `📊 Status: ${snapshot.status}\n` +
+              `✅ Available: ${snapshot.available ? 'Yes' : 'No'}`
+          }]
+        };
     } catch (error) {
       return {
         content: [{
@@ -270,7 +277,7 @@ server.tool(
   "search-wayback-history",
   "Search the complete history of snapshots for a URL in the Wayback Machine",
   {
-    url: z.string().url().describe("The URL to search for in the Wayback Machine"),
+    url: z.string().describe("The URL to search for in the Wayback Machine (with or without https://)"),
     from: z.string().optional().describe("Start date for search (flexible format: 'Jan 1 2025', '2021', '2021-2025', 'YYYYMMDD', 'YYYY-MM-DD', 'MM/DD/YYYY', 'January 2025', 'last year', etc.)"),
     to: z.string().optional().describe("End date for search (flexible format: 'Jan 1 2025', '2021', '2021-2025', 'YYYYMMDD', 'YYYY-MM-DD', 'MM/DD/YYYY', 'January 2025', 'today', etc.)"),
     limit: z.number().min(1).max(1000).optional().default(100).describe("Maximum number of results to return"),
@@ -278,9 +285,10 @@ server.tool(
   },
   async ({ url, from, to, limit, filter }) => {
     try {
+      const normalizedUrl = normalizeUrl(url);
       // Use CDX API for comprehensive search
       const params: Record<string, any> = {
-        url,
+        url: normalizedUrl,
         output: "json",
         limit,
       };
@@ -334,15 +342,13 @@ server.tool(
                  `   📊 Status: ${statuscode}\n` +
                  `   🌐 Archive: https://web.archive.org/web/${timestamp}/${originalUrl}`;
         })
-        .join("\n\n");
-
-      return {
-        content: [{
-          type: "text",
-          text: `📚 Wayback Machine History for ${url}:\n\n` +
-            `Found ${snapshots.length} snapshots:\n\n${snapshotText}`
-        }]
-      };
+        .join("\n\n");        return {
+          content: [{
+            type: "text",
+            text: `📚 Wayback Machine History for ${normalizedUrl}:\n\n` +
+              `Found ${snapshots.length} snapshots:\n\n${snapshotText}`
+          }]
+        };
     } catch (error) {
       return {
         content: [{
@@ -358,51 +364,151 @@ server.tool(
   "save-page-now",
   "Saves the current version of a page to the Wayback Machine",
   {
-    url: z.string().url().describe("The URL to archive"),
+    url: z.string().describe("The URL to archive (with or without https://)"),
     capture_all: z.boolean().optional().default(false).describe("Capture outlinks and embedded resources"),
   },
   async ({ url, capture_all }) => {
-    try {
-      const saveUrl = capture_all 
-        ? `https://web.archive.org/save/${encodeURIComponent(url)}`
-        : `https://web.archive.org/save/${encodeURIComponent(url)}?capture_all=on`;
+    const normalizedUrl = normalizeUrl(url);
+    
+    // Helper function to make a save request with retries
+    async function makeSaveRequest(attempt: number = 1): Promise<any> {
+      const maxAttempts = 3;
+      const timeoutMs = Math.min(15000 + (attempt * 10000), 45000); // Progressive timeout: 15s, 25s, 35s
+      
+      try {
+        const saveUrl = capture_all 
+          ? `https://web.archive.org/save/${encodeURIComponent(normalizedUrl)}?capture_all=on`
+          : `https://web.archive.org/save/${encodeURIComponent(normalizedUrl)}`;
 
-      // Make the request to save the page
-      const response = await axios.get(saveUrl, {
-        timeout: 60000, // 60 second timeout for save operations
-        maxRedirects: 5,
-      });
+        console.log(`Attempt ${attempt}/${maxAttempts}: Saving ${normalizedUrl} with timeout ${timeoutMs}ms`);
+
+        const response = await axios.get(saveUrl, {
+          timeout: timeoutMs,
+          maxRedirects: 10,
+          validateStatus: (status) => status < 600, // Accept all status codes under 600
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (compatible; MCP-Wayback/1.0)',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+          }
+        });
+
+        return response;
+      } catch (error: any) {
+        console.log(`Attempt ${attempt} failed:`, error.message);
+        
+        // Retry on timeout or connection errors (but not on 4xx errors)
+        if (attempt < maxAttempts && 
+            (error.code === 'ECONNABORTED' || 
+             error.code === 'ETIMEDOUT' || 
+             error.code === 'ECONNRESET' || 
+             error.message.includes('timeout') ||
+             error.message.includes('ENOTFOUND'))) {
+          
+          const delayMs = 2000 * attempt; // Progressive delay: 2s, 4s, 6s
+          console.log(`Retrying in ${delayMs}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+          return makeSaveRequest(attempt + 1);
+        }
+        
+        throw error;
+      }
+    }
+
+    try {
+      const response = await makeSaveRequest();
 
       // Check if we got redirected to an archived page
-      const finalUrl = response.request.res.responseUrl || saveUrl;
-      const isArchived = finalUrl.includes('/web/');
+      const finalUrl = response.request.res?.responseUrl || response.config?.url || response.config.url;
+      const isArchived = finalUrl && finalUrl.includes('/web/');
 
-      if (isArchived) {
+      // Handle different response statuses
+      if (response.status === 523) {
         return {
           content: [{
             type: "text",
-            text: `✅ Successfully archived ${url}!\n\n` +
+            text: `⚠️ Wayback Machine is currently experiencing connectivity issues (Error 523)\n\n` +
+              `🔄 Archive request for ${normalizedUrl} has been submitted\n` +
+              `📋 The archive may still be processing. You can:\n` +
+              `   1. Check status at: https://web.archive.org/web/*/${normalizedUrl}\n` +
+              `   2. Try again in 5-10 minutes\n` +
+              `   3. For large sites like GitHub, archiving can take longer\n\n` +
+              `💡 Direct link: https://web.archive.org/save/${normalizedUrl}`
+          }]
+        };
+      }
+
+      if (response.status >= 500) {
+        return {
+          content: [{
+            type: "text",
+            text: `⚠️ Wayback Machine server error (${response.status})\n\n` +
+              `🔄 Archive request for ${normalizedUrl} submitted but server is busy\n` +
+              `📋 For popular sites like GitHub, the archive may take 10-30 minutes\n` +
+              `🔍 Check status: https://web.archive.org/web/*/${normalizedUrl}\n` +
+              `💡 Manual submission: https://web.archive.org/save/${normalizedUrl}`
+          }]
+        };
+      }
+
+      if (isArchived) {
+        // Extract timestamp from archived URL if possible
+        const timestampMatch = finalUrl.match(/\/web\/(\d+)\//);
+        const timestamp = timestampMatch ? timestampMatch[1] : new Date().toISOString().replace(/\D/g, '').slice(0, 14);
+        
+        return {
+          content: [{
+            type: "text",
+            text: `✅ Successfully archived ${normalizedUrl}!\n\n` +
               `📸 Archived URL: ${finalUrl}\n` +
-              `🕒 Archive created at: ${new Date().toISOString()}\n` +
-              `${capture_all ? '📦 Captured with outlinks and resources' : '📄 Basic capture'}`
+              `🕒 Timestamp: ${timestamp}\n` +
+              `📅 Readable date: ${new Date().toLocaleString()}\n` +
+              `${capture_all ? '📦 Captured with outlinks and resources' : '📄 Basic capture'}\n\n` +
+              `🔍 View all snapshots: https://web.archive.org/web/*/${normalizedUrl}`
           }]
         };
       } else {
         return {
           content: [{
             type: "text",
-            text: `🔄 Archive request submitted for ${url}\n\n` +
-              `Please check back later at: https://web.archive.org/web/*/${url}\n` +
-              `Note: It may take a few minutes for the archive to become available.`
+            text: `🔄 Archive request submitted for ${normalizedUrl}\n\n` +
+              `⏱️ Processing time varies by site complexity:\n` +
+              `   • Simple pages: 1-5 minutes\n` +
+              `   • Complex sites (like GitHub): 10-30 minutes\n` +
+              `   • Very large sites: Up to several hours\n\n` +
+              `🔍 Check progress: https://web.archive.org/web/*/${normalizedUrl}\n` +
+              `💡 Archive status will appear when ready`
           }]
         };
       }
-    } catch (error) {
+    } catch (error: any) {
+      // Provide more helpful error messages based on error type
+      let errorMessage = `❌ Error saving page to Wayback Machine\n\n`;
+      
+      if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+        errorMessage += `⏱️ Request timed out after multiple attempts\n` +
+          `📋 This often happens with large sites like GitHub\n` +
+          `🔄 The archive request may still be processing in the background\n\n` +
+          `✅ What you can do:\n` +
+          `   1. Wait 15-30 minutes and check: https://web.archive.org/web/*/${normalizedUrl}\n` +
+          `   2. Try a specific page instead of the main domain\n` +
+          `   3. Submit manually: https://web.archive.org/save/${normalizedUrl}`;
+      } else if (error.response?.status === 429) {
+        errorMessage += `🚫 Rate limited by Wayback Machine\n` +
+          `⏱️ Please wait a few minutes before trying again\n` +
+          `💡 Manual submission: https://web.archive.org/save/${normalizedUrl}`;
+      } else if (error.code === 'ENOTFOUND') {
+        errorMessage += `🌐 Network connectivity issue\n` +
+          `📋 Check your internet connection and try again\n` +
+          `💡 Manual submission: https://web.archive.org/save/${normalizedUrl}`;
+      } else {
+        errorMessage += `📋 Error details: ${error.message}\n\n` +
+          `💡 You can try manually at: https://web.archive.org/save/${normalizedUrl}`;
+      }
+      
       return {
         content: [{
           type: "text",
-          text: `❌ Error saving page: ${error instanceof Error ? error.message : String(error)}\n\n` +
-            `You can try manually at: https://web.archive.org/save/${url}`
+          text: errorMessage
         }]
       };
     }
@@ -413,15 +519,16 @@ server.tool(
   "get-wayback-stats",
   "Get statistics about how many times a URL has been archived",
   {
-    url: z.string().url().describe("The URL to get statistics for"),
+    url: z.string().describe("The URL to get statistics for (with or without https://)"),
   },
   async ({ url }) => {
     try {
+      const normalizedUrl = normalizeUrl(url);
       // Get count of all snapshots
       const response = await makeWaybackRequest<WaybackSearchResult[]>({
         endpoint: "https://web.archive.org/cdx/search/cdx",
         params: {
-          url,
+          url: normalizedUrl,
           output: "json",
           showNumPages: "true",
         },
@@ -431,7 +538,7 @@ server.tool(
         return {
           content: [{
             type: "text",
-            text: `📊 Wayback Machine Statistics for ${url}:\n\n` +
+            text: `📊 Wayback Machine Statistics for ${normalizedUrl}:\n\n` +
               `Total snapshots: 0\n` +
               `First archived: Never\n` +
               `Last archived: Never`
@@ -447,7 +554,7 @@ server.tool(
         return {
           content: [{
             type: "text",
-            text: `📊 Wayback Machine Statistics for ${url}:\n\n` +
+            text: `📊 Wayback Machine Statistics for ${normalizedUrl}:\n\n` +
               `Total snapshots: 0\n` +
               `Status: Never archived`
           }]
@@ -477,19 +584,17 @@ server.tool(
         lastTimestamp.substr(8, 2) + ':' + 
         lastTimestamp.substr(10, 2) + ':' + 
         lastTimestamp.substr(12, 2) + 'Z'
-      ).toISOString() : 'Unknown';
-
-      return {
-        content: [{
-          type: "text",
-          text: `📊 Wayback Machine Statistics for ${url}:\n\n` +
-            `📈 Total snapshots: ${totalSnapshots}\n` +
-            `🕐 First archived: ${firstDate}\n` +
-            `🕓 Last archived: ${lastDate}\n` +
-            `📅 Archive span: ${Math.ceil((new Date(lastDate).getTime() - new Date(firstDate).getTime()) / (1000 * 60 * 60 * 24))} days\n` +
-            `🔗 Browse all: https://web.archive.org/web/*/${url}`
-        }]
-      };
+      ).toISOString() : 'Unknown';        return {
+          content: [{
+            type: "text",
+            text: `📊 Wayback Machine Statistics for ${normalizedUrl}:\n\n` +
+              `📈 Total snapshots: ${totalSnapshots}\n` +
+              `🕐 First archived: ${firstDate}\n` +
+              `🕓 Last archived: ${lastDate}\n` +
+              `📅 Archive span: ${Math.ceil((new Date(lastDate).getTime() - new Date(firstDate).getTime()) / (1000 * 60 * 60 * 24))} days\n` +
+              `🔗 Browse all: https://web.archive.org/web/*/${normalizedUrl}`
+          }]
+        };
     } catch (error) {
       return {
         content: [{
@@ -505,12 +610,13 @@ server.tool(
   "compare-wayback-versions",
   "Compare two different archived versions of the same URL",
   {
-    url: z.string().url().describe("The URL to compare versions for"),
+    url: z.string().describe("The URL to compare versions for (with or without https://)"),
     timestamp1: z.string().describe("First timestamp (flexible format: 'Jan 1 2025', '2021', 'YYYYMMDD', 'YYYY-MM-DD', 'MM/DD/YYYY', 'January 2025', 'today', etc.)"),
     timestamp2: z.string().describe("Second timestamp (flexible format: 'Jan 1 2025', '2021', 'YYYYMMDD', 'YYYY-MM-DD', 'MM/DD/YYYY', 'January 2025', 'today', etc.)"),
   },
   async ({ url, timestamp1, timestamp2 }) => {
     try {
+      const normalizedUrl = normalizeUrl(url);
       // Parse flexible timestamps
       const parsedTimestamp1 = parseFlexibleDate(timestamp1);
       const parsedTimestamp2 = parseFlexibleDate(timestamp2);
@@ -529,14 +635,14 @@ server.tool(
         archived_snapshots: { closest?: WaybackSnapshot };
       }>({
         endpoint: "https://archive.org/wayback/available",
-        params: { url, timestamp: parsedTimestamp1 },
+        params: { url: normalizedUrl, timestamp: parsedTimestamp1 },
       });
 
       const snapshot2Response = await makeWaybackRequest<{
         archived_snapshots: { closest?: WaybackSnapshot };
       }>({
         endpoint: "https://archive.org/wayback/available",
-        params: { url, timestamp: parsedTimestamp2 },
+        params: { url: normalizedUrl, timestamp: parsedTimestamp2 },
       });
 
       const snap1 = snapshot1Response.archived_snapshots?.closest;
@@ -571,24 +677,22 @@ server.tool(
         snap2.timestamp.substr(12, 2) + 'Z'
       ).toISOString();
 
-      const daysDiff = Math.abs((new Date(date2).getTime() - new Date(date1).getTime()) / (1000 * 60 * 60 * 24));
-
-      return {
-        content: [{
-          type: "text",
-          text: `🔍 Wayback Machine Version Comparison for ${url}:\n\n` +
-            `📅 Version 1: ${date1}\n` +
-            `🔗 URL: ${snap1.url}\n` +
-            `📊 Status: ${snap1.status}\n\n` +
-            `📅 Version 2: ${date2}\n` +
-            `🔗 URL: ${snap2.url}\n` +
-            `📊 Status: ${snap2.status}\n\n` +
-            `⏱️ Time difference: ${Math.round(daysDiff)} days\n\n` +
-            `🔗 Compare visually:\n` +
-            `Version 1: ${snap1.url}\n` +
-            `Version 2: ${snap2.url}`
-        }]
-      };
+      const daysDiff = Math.abs((new Date(date2).getTime() - new Date(date1).getTime()) / (1000 * 60 * 60 * 24));        return {
+          content: [{
+            type: "text",
+            text: `🔍 Wayback Machine Version Comparison for ${normalizedUrl}:\n\n` +
+              `📅 Version 1: ${date1}\n` +
+              `🔗 URL: ${snap1.url}\n` +
+              `📊 Status: ${snap1.status}\n\n` +
+              `📅 Version 2: ${date2}\n` +
+              `🔗 URL: ${snap2.url}\n` +
+              `📊 Status: ${snap2.status}\n\n` +
+              `⏱️ Time difference: ${Math.round(daysDiff)} days\n\n` +
+              `🔗 Compare visually:\n` +
+              `Version 1: ${snap1.url}\n` +
+              `Version 2: ${snap2.url}`
+          }]
+        };
     } catch (error) {
       return {
         content: [{
@@ -606,12 +710,13 @@ server.tool(
   "get_snapshots",
   "Fetch closest available snapshot for a URL (alias for get-wayback-snapshots)",
   {
-    url: z.string().url().describe("The URL to look up"),
+    url: z.string().describe("The URL to look up (with or without https://)"),
     timestamp: z.string().optional().describe("Specific timestamp (flexible format: 'Jan 1 2025', '2021', 'YYYYMMDD', 'YYYY-MM-DD', 'MM/DD/YYYY', 'January 2025', 'today', etc.)"),
   },
   async ({ url, timestamp }) => {
+    const normalizedUrl = normalizeUrl(url);
     // Reuse existing get-wayback-snapshots implementation
-    const params: Record<string, any> = { url };
+    const params: Record<string, any> = { url: normalizedUrl };
     if (timestamp) {
       const parsedTimestamp = parseFlexibleDate(timestamp);
       if (parsedTimestamp) params.timestamp = parsedTimestamp;
@@ -630,7 +735,7 @@ server.tool(
         return {
           content: [{
             type: "text",
-            text: `No snapshots found for ${url}`
+            text: `No snapshots found for ${normalizedUrl}`
           }]
         };
       }
@@ -657,14 +762,15 @@ server.tool(
   "get_latest_snapshot",
   "Get the most recent snapshot of a URL",
   {
-    url: z.string().url().describe("The URL to get the latest snapshot for"),
+    url: z.string().describe("The URL to get the latest snapshot for (with or without https://)"),
   },
   async ({ url }) => {
     try {
+      const normalizedUrl = normalizeUrl(url);
       const response = await makeWaybackRequest<WaybackSearchResult[]>({
         endpoint: "https://web.archive.org/cdx/search/cdx",
         params: {
-          url,
+          url: normalizedUrl,
           output: "json",
           limit: 1,
           sort: "reverse"
@@ -683,17 +789,15 @@ server.tool(
       const latest = response[1] as any;
       const timestamp = latest[1];
       const originalUrl = latest[2];
-      const statuscode = latest[4];
-      
-      return {
-        content: [{
-          type: "text",
-          text: `🕐 Latest Snapshot for ${url}:\n\n` +
-            `📅 Date: ${timestamp}\n` +
-            `🔗 Archive URL: https://web.archive.org/web/${timestamp}/${originalUrl}\n` +
-            `📊 Status: ${statuscode}`
-        }]
-      };
+      const statuscode = latest[4];        return {
+          content: [{
+            type: "text",
+            text: `🕐 Latest Snapshot for ${normalizedUrl}:\n\n` +
+              `📅 Date: ${timestamp}\n` +
+              `🔗 Archive URL: https://web.archive.org/web/${timestamp}/${originalUrl}\n` +
+              `📊 Status: ${statuscode}`
+          }]
+        };
     } catch (error) {
       return {
         content: [{
@@ -709,17 +813,18 @@ server.tool(
   "get_archived_page",
   "Fetch and preview raw HTML of a snapshot",
   {
-    url: z.string().url().describe("The URL to get archived content for"),
+    url: z.string().describe("The URL to get archived content for (with or without https://)"),
     timestamp: z.string().optional().describe("Specific timestamp (flexible format: 'Jan 1 2025', '2021', 'YYYYMMDD', 'YYYY-MM-DD', 'MM/DD/YYYY', 'January 2025', 'today', etc.)"),
   },
   async ({ url, timestamp }) => {
     try {
+      const normalizedUrl = normalizeUrl(url);
       let archiveUrl: string;
       
       if (timestamp) {
         const parsedTimestamp = parseFlexibleDate(timestamp);
         if (parsedTimestamp) {
-          archiveUrl = `https://web.archive.org/web/${parsedTimestamp}/${url}`;
+          archiveUrl = `https://web.archive.org/web/${parsedTimestamp}/${normalizedUrl}`;
         } else {
           return {
             content: [{
@@ -734,14 +839,14 @@ server.tool(
           archived_snapshots: { closest?: WaybackSnapshot };
         }>({
           endpoint: "https://archive.org/wayback/available",
-          params: { url },
+          params: { url: normalizedUrl },
         });
 
         if (!response.archived_snapshots?.closest) {
           return {
             content: [{
               type: "text",
-              text: `No archived content found for ${url}`
+              text: `No archived content found for ${normalizedUrl}`
             }]
           };
         }
@@ -780,15 +885,16 @@ server.tool(
   "list_snapshot_dates",
   "List all snapshot timestamps for a URL",
   {
-    url: z.string().url().describe("The URL to list snapshots for"),
+    url: z.string().describe("The URL to list snapshots for (with or without https://)"),
     limit: z.number().min(1).max(1000).optional().default(100).describe("Maximum number of timestamps to return"),
   },
   async ({ url, limit }) => {
     try {
+      const normalizedUrl = normalizeUrl(url);
       const response = await makeWaybackRequest<WaybackSearchResult[]>({
         endpoint: "https://web.archive.org/cdx/search/cdx",
         params: {
-          url,
+          url: normalizedUrl,
           output: "json",
           limit,
           collapse: "timestamp"
@@ -828,7 +934,7 @@ server.tool(
   "get_diff_summary",
   "Text difference summary between two archived versions",
   {
-    url: z.string().url().describe("The URL to compare"),
+    url: z.string().describe("The URL to compare (with or without https://)"),
     timestamp1: z.string().describe("First timestamp (flexible format: 'Jan 1 2025', '2021', 'YYYYMMDD', 'YYYY-MM-DD', 'MM/DD/YYYY', 'January 2025', 'today', etc.)"),
     timestamp2: z.string().describe("Second timestamp (flexible format: 'Jan 1 2025', '2021', 'YYYYMMDD', 'YYYY-MM-DD', 'MM/DD/YYYY', 'January 2025', 'today', etc.)"),
   },
@@ -885,7 +991,7 @@ server.tool(
   "compare_page_length",
   "Compare size/length (bytes) of two archived versions",
   {
-    url: z.string().url().describe("The URL to compare"),
+    url: z.string().describe("The URL to compare (with or without https://)"),
     timestamp1: z.string().describe("First timestamp (flexible format: 'Jan 1 2025', '2021', 'YYYYMMDD', 'YYYY-MM-DD', 'MM/DD/YYYY', 'January 2025', 'today', etc.)"),
     timestamp2: z.string().describe("Second timestamp (flexible format: 'Jan 1 2025', '2021', 'YYYYMMDD', 'YYYY-MM-DD', 'MM/DD/YYYY', 'January 2025', 'today', etc.)"),
   },
@@ -965,25 +1071,24 @@ server.tool(
   "check_if_archived",
   "Return true/false if a page has ever been archived",
   {
-    url: z.string().url().describe("The URL to check"),
+    url: z.string().describe("The URL to check (with or without https://)"),
   },
   async ({ url }) => {
     try {
+      const normalizedUrl = normalizeUrl(url);
       const response = await makeWaybackRequest<{
         archived_snapshots: { closest?: WaybackSnapshot };
       }>({
         endpoint: "https://archive.org/wayback/available",
-        params: { url },
+        params: { url: normalizedUrl },
       });
 
-      const isArchived = !!response.archived_snapshots?.closest;
-      
-      return {
-        content: [{
-          type: "text",
-          text: `🔍 Archive Status for ${url}: ${isArchived ? '✅ ARCHIVED' : '❌ NOT ARCHIVED'}`
-        }]
-      };
+      const isArchived = !!response.archived_snapshots?.closest;        return {
+          content: [{
+            type: "text",
+            text: `🔍 Archive Status for ${normalizedUrl}: ${isArchived ? '✅ ARCHIVED' : '❌ NOT ARCHIVED'}`
+          }]
+        };
     } catch (error) {
       return {
         content: [{
@@ -1049,13 +1154,14 @@ server.tool(
   "get_wayback_metadata",
   "Return headers, content-type, size, etc. for snapshot",
   {
-    url: z.string().url().describe("The URL to get metadata for"),
+    url: z.string().describe("The URL to get metadata for (with or without https://)"),
     timestamp: z.string().optional().describe("Specific timestamp (flexible format: 'Jan 1 2025', '2021', 'YYYYMMDD', 'YYYY-MM-DD', 'MM/DD/YYYY', 'January 2025', 'today', etc.)"),
   },
   async ({ url, timestamp }) => {
     try {
+      const normalizedUrl = normalizeUrl(url);
       const params: Record<string, any> = {
-        url,
+        url: normalizedUrl,
         output: "json",
         limit: 1,
       };
@@ -1113,11 +1219,12 @@ server.tool(
   "check_robots_status",
   "Check if URL is disallowed from archiving via robots.txt",
   {
-    url: z.string().url().describe("The URL to check robots.txt status for"),
+    url: z.string().describe("The URL to check robots.txt status for (with or without https://)"),
   },
   async ({ url }) => {
     try {
-      const urlObj = new URL(url);
+      const normalizedUrl = normalizeUrl(url);
+      const urlObj = new URL(normalizedUrl);
       const robotsUrl = `${urlObj.protocol}//${urlObj.host}/robots.txt`;
       
       const robotsResponse = await axios.get(robotsUrl, {
@@ -1195,7 +1302,7 @@ server.tool(
   "archive_multiple_urls",
   "Archive an array of URLs in one request",
   {
-    urls: z.array(z.string().url()).max(10).describe("Array of URLs to archive (max 10)"),
+    urls: z.array(z.string()).max(10).describe("Array of URLs to archive (max 10, with or without https://)"),
     capture_all: z.boolean().optional().default(false).describe("Capture embedded resources"),
   },
   async ({ urls, capture_all }) => {
@@ -1239,7 +1346,7 @@ server.tool(
   "get_archived_titles",
   "Extract <title> of each snapshot for quick glance",
   {
-    url: z.string().url().describe("The URL to get titles for"),
+    url: z.string().describe("The URL to get titles for (with or without https://)"),
     limit: z.number().min(1).max(50).optional().default(10).describe("Number of snapshots to check"),
   },
   async ({ url, limit }) => {
@@ -1309,7 +1416,7 @@ server.tool(
   "extract_text_from_snapshot",
   "Extract only visible <body> text for readability",
   {
-    url: z.string().url().describe("The URL to extract text from"),
+    url: z.string().describe("The URL to extract text from (with or without https://)"),
     timestamp: z.string().optional().describe("Specific timestamp (flexible format: 'Jan 1 2025', '2021', 'YYYYMMDD', 'YYYY-MM-DD', 'MM/DD/YYYY', 'January 2025', 'today', etc.)"),
   },
   async ({ url, timestamp }) => {
@@ -1386,7 +1493,7 @@ server.tool(
   "get_status_codes_over_time",
   "Track how HTTP status codes changed over time for the URL",
   {
-    url: z.string().url().describe("The URL to track status codes for"),
+    url: z.string().describe("The URL to track status codes for (with or without https://)"),
     limit: z.number().min(1).max(100).optional().default(50).describe("Number of snapshots to analyze"),
   },
   async ({ url, limit }) => {
@@ -1453,7 +1560,7 @@ server.tool(
   "search_keyword_in_snapshots",
   "Find snapshots that contain a given keyword (HTML/text search)",
   {
-    url: z.string().url().describe("The URL to search in"),
+    url: z.string().describe("The URL to search in (with or without https://)"),
     keyword: z.string().describe("The keyword to search for"),
     limit: z.number().min(1).max(20).optional().default(10).describe("Max snapshots to check"),
   },
@@ -1534,7 +1641,7 @@ server.tool(
   "visualize_snapshot_frequency",
   "Return chart-friendly data (timestamp vs count)",
   {
-    url: z.string().url().describe("The URL to analyze frequency for"),
+    url: z.string().describe("The URL to analyze frequency for (with or without https://)"),
     granularity: z.enum(["year", "month", "day"]).optional().default("month").describe("Time granularity"),
   },
   async ({ url, granularity }) => {
@@ -1610,14 +1717,15 @@ server.tool(
   "get_first_archived_snapshot",
   "Return only the very first archived version",
   {
-    url: z.string().url().describe("The URL to get the first snapshot for"),
+    url: z.string().describe("The URL to get the first snapshot for (with or without https://)"),
   },
   async ({ url }) => {
     try {
+      const normalizedUrl = normalizeUrl(url);
       const response = await makeWaybackRequest<WaybackSearchResult[]>({
         endpoint: "https://web.archive.org/cdx/search/cdx",
         params: {
-          url,
+          url: normalizedUrl,
           output: "json",
           limit: 1,
           sort: "timestamp"
@@ -1628,7 +1736,7 @@ server.tool(
         return {
           content: [{
             type: "text",
-            text: `No snapshots found for ${url}`
+            text: `No snapshots found for ${normalizedUrl}`
           }]
         };
       }
@@ -1672,7 +1780,7 @@ server.tool(
   "get_most_changed_snapshots",
   "Show which snapshots differ the most in size or structure",
   {
-    url: z.string().url().describe("The URL to analyze changes for"),
+    url: z.string().describe("The URL to analyze changes for (with or without https://)"),
     limit: z.number().min(1).max(50).optional().default(20).describe("Number of snapshots to analyze"),
   },
   async ({ url, limit }) => {
@@ -1750,7 +1858,7 @@ server.tool(
   "get_snapshot_redirect_chain",
   "Show original-to-final redirects stored in snapshot metadata",
   {
-    url: z.string().url().describe("The URL to check redirects for"),
+    url: z.string().describe("The URL to check redirects for (with or without https://)"),
     timestamp: z.string().optional().describe("Specific timestamp (flexible format: 'Jan 1 2025', '2021', 'YYYYMMDD', 'YYYY-MM-DD', 'MM/DD/YYYY', 'January 2025', 'today', etc.)"),
   },
   async ({ url, timestamp }) => {
@@ -1829,7 +1937,7 @@ server.tool(
   "get_archived_links_from_page",
   "Extract all hyperlinks from an archived page",
   {
-    url: z.string().url().describe("The URL to extract links from"),
+    url: z.string().describe("The URL to extract links from (with or without https://)"),
     timestamp: z.string().optional().describe("Specific timestamp (flexible format: 'Jan 1 2025', '2021', 'YYYYMMDD', 'YYYY-MM-DD', 'MM/DD/YYYY', 'January 2025', 'today', etc.)"),
     limit: z.number().min(1).max(100).optional().default(50).describe("Max links to return"),
   },
@@ -1914,13 +2022,14 @@ server.tool(
   "check_link_rot_status",
   "Check if original URL still exists (for broken-link detection)",
   {
-    url: z.string().url().describe("The URL to check current status for"),
+    url: z.string().describe("The URL to check current status for (with or without https://)"),
   },
   async ({ url }) => {
+    const normalizedUrl = normalizeUrl(url);
     try {
       const startTime = Date.now();
       
-      const response = await axios.get(url, {
+      const response = await axios.get(normalizedUrl, {
         timeout: 15000,
         maxRedirects: 5,
         validateStatus: () => true // Accept all status codes
@@ -1930,30 +2039,27 @@ server.tool(
       const responseTime = endTime - startTime;
       
       const isWorking = response.status >= 200 && response.status < 400;
-      const status = isWorking ? '✅ WORKING' : '❌ BROKEN';
-      
-      return {
-        content: [{
-          type: "text",
-          text: `🔍 Link Status Check for ${url}:\n\n` +
-            `📊 Status: ${status}\n` +
-            `🌐 HTTP Code: ${response.status}\n` +
-            `⏱️ Response Time: ${responseTime}ms\n` +
-            `📏 Content Length: ${response.headers['content-length'] || 'Unknown'}\n` +
-            `📄 Content Type: ${response.headers['content-type'] || 'Unknown'}\n` +
-            `🕒 Checked: ${new Date().toISOString()}`
-        }]
-      };
-    } catch (error) {
-      return {
-        content: [{
-          type: "text",
-          text: `🔍 Link Status Check for ${url}:\n\n` +
-            `📊 Status: ❌ BROKEN\n` +
-            `❌ Error: ${error instanceof Error ? error.message : String(error)}\n` +
-            `🕒 Checked: ${new Date().toISOString()}`
-        }]
-      };
+      const status = isWorking ? '✅ WORKING' : '❌ BROKEN';        return {
+          content: [{
+            type: "text",
+            text: `🔍 Link Status Check for ${normalizedUrl}:\n\n` +
+              `📊 Status: ${status}\n` +
+              `🌐 HTTP Code: ${response.status}\n` +
+              `⏱️ Response Time: ${responseTime}ms\n` +
+              `📏 Content Length: ${response.headers['content-length'] || 'Unknown'}\n` +
+              `📄 Content Type: ${response.headers['content-type'] || 'Unknown'}\n` +
+              `🕒 Checked: ${new Date().toISOString()}`
+          }]
+        };
+    } catch (error) {        return {
+          content: [{
+            type: "text",
+            text: `🔍 Link Status Check for ${normalizedUrl}:\n\n` +
+              `📊 Status: ❌ BROKEN\n` +
+              `❌ Error: ${error instanceof Error ? error.message : String(error)}\n` +
+              `🕒 Checked: ${new Date().toISOString()}`
+          }]
+        };
     }
   }
 );

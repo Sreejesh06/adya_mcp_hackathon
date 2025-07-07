@@ -434,6 +434,127 @@
 							"response": []
 						}
 					]
+				},
+				{
+					"name": "WAYBACK",
+					"item": [
+						{
+							"name": "Compare Netflix Versions (2020 vs 2024)",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"selected_server_credentials\": {\r\n        \"WAYBACK\": {}\r\n    },\r\n    \"client_details\": {\r\n        \"api_key\": \"\",\r\n        \"temperature\": 0.1,\r\n        \"max_token\": 20000,\r\n        \"input\": \"Compare two archived versions of netflix.com from 2020 and 2024\",\r\n        \"input_type\": \"text\",\r\n        \"prompt\": \"You are a web archiving assistant. Use the WAYBACK tools to compare different archived versions of websites. Always call the appropriate WAYBACK tool functions.\",\r\n        \"chat_model\": \"gemini-2.0-flash-lite\",\r\n        \"chat_history\": []\r\n    },\r\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\r\n    \"selected_servers\": [\r\n        \"WAYBACK\"\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+									"host": [
+										"{{dev-js-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"mcp",
+										"process_message"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Archive GitHub Page",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"selected_server_credentials\": {\r\n        \"WAYBACK\": {}\r\n    },\r\n    \"client_details\": {\r\n        \"api_key\": \"\",\r\n        \"temperature\": 0.1,\r\n        \"max_token\": 20000,\r\n        \"input\": \"Archive github.com/microsoft/vscode to the Wayback Machine\",\r\n        \"input_type\": \"text\",\r\n        \"prompt\": \"You are a web archiving assistant. Use the WAYBACK save-page-now tool to archive the requested URL. Always call the tool function.\",\r\n        \"chat_model\": \"gemini-2.0-flash-lite\",\r\n        \"chat_history\": []\r\n    },\r\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\r\n    \"selected_servers\": [\r\n        \"WAYBACK\"\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+									"host": [
+										"{{dev-js-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"mcp",
+										"process_message"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Wayback Snapshots",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"selected_server_credentials\": {\r\n        \"WAYBACK\": {}\r\n    },\r\n    \"client_details\": {\r\n        \"api_key\": \"\",\r\n        \"temperature\": 0.1,\r\n        \"max_token\": 20000,\r\n        \"input\": \"Find archived snapshots of tesla.com from 2023\",\r\n        \"input_type\": \"text\",\r\n        \"prompt\": \"You are a web archiving assistant. Use the WAYBACK get-wayback-snapshots tool to find historical snapshots. Always call the tool function.\",\r\n        \"chat_model\": \"gemini-2.0-flash-lite\",\r\n        \"chat_history\": []\r\n    },\r\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\r\n    \"selected_servers\": [\r\n        \"WAYBACK\"\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+									"host": [
+										"{{dev-js-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"mcp",
+										"process_message"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Direct Tool Call Test",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"selected_server_credentials\": {\r\n        \"WAYBACK\": {}\r\n    },\r\n    \"client_details\": {\r\n        \"api_key\": \"\",\r\n        \"temperature\": 0.0,\r\n        \"max_token\": 20000,\r\n        \"input\": \"Use the get-wayback-snapshots tool to search for netflix.com snapshots\",\r\n        \"input_type\": \"text\",\r\n        \"prompt\": \"You are a function calling assistant. When asked to use a tool, you MUST call the function. Do not explain, just call the tool immediately.\",\r\n        \"chat_model\": \"gemini-2.0-flash-lite\",\r\n        \"chat_history\": []\r\n    },\r\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\r\n    \"selected_servers\": [\r\n        \"WAYBACK\"\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+									"host": [
+										"{{dev-js-host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"mcp",
+										"process_message"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		}

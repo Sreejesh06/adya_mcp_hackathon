@@ -1,0 +1,1030 @@
+{
+  "info": {
+    "_postman_id": "wayback-mcp-2025",
+    "name": "WAYBACK-MCP",
+    "description": "Complete testing collection for WAYBACK Machine MCP Server with all 22 tools",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "wayback-2025"
+  },
+  "item": [
+    {
+      "name": "🕰️ WAYBACK - Core Tools",
+      "item": [
+        {
+          "name": "1. Get Wayback Snapshots",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Find archived snapshots of tesla.com from 2023\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Use the WAYBACK tools to find historical snapshots.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test get-wayback-snapshots for Tesla.com 2023 snapshots"
+          }
+        },
+        {
+          "name": "2. Search Wayback History",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Search the complete archival history of apple.com from 2020 to 2024\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Search the complete snapshot history.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test search-wayback-history for Apple.com 2020-2024"
+          }
+        },
+        {
+          "name": "3. Save Page Now",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Archive the current version of github.com/microsoft/vscode to the Wayback Machine\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Save the current page to the archive.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test save-page-now for GitHub VS Code repository"
+          }
+        },
+        {
+          "name": "4. Get Wayback Stats",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Get statistics about how many times google.com has been archived\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Get archival statistics for websites.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test get-wayback-stats for Google.com archival statistics"
+          }
+        },
+        {
+          "name": "5. Compare Wayback Versions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Compare two archived versions of netflix.com from 2020 and 2024\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Compare different archived versions.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test compare-wayback-versions for Netflix.com 2020 vs 2024"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Snapshot Analysis Tools",
+      "item": [
+        {
+          "name": "6. Get Snapshots",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Get the closest snapshot of amazon.com from January 2023\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Find the closest snapshot to a specific date.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test get_snapshots for Amazon.com January 2023"
+          }
+        },
+        {
+          "name": "7. Get Latest Snapshot",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Get the most recent archived snapshot of facebook.com\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Find the most recent snapshot.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test get_latest_snapshot for Facebook.com"
+          }
+        },
+        {
+          "name": "8. Get Archived Page",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Fetch and preview the raw HTML of twitter.com from 2022\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Fetch archived HTML content.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test get_archived_page for Twitter.com 2022 HTML"
+          }
+        },
+        {
+          "name": "9. List Snapshot Dates",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"List all snapshot timestamps for microsoft.com\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. List all available snapshot dates.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test list_snapshot_dates for Microsoft.com"
+          }
+        },
+        {
+          "name": "10. Get First Archived Snapshot",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Get the very first archived snapshot of yahoo.com\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Find the first ever archived snapshot.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test get_first_archived_snapshot for Yahoo.com"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔍 Comparison & Analysis Tools",
+      "item": [
+        {
+          "name": "11. Get Diff Summary",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Get a text difference summary between two archived versions of reddit.com from 2021 and 2023\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Compare content differences between snapshots.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test get_diff_summary for Reddit.com 2021 vs 2023"
+          }
+        },
+        {
+          "name": "12. Compare Page Length",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Compare the size/length in bytes of two archived versions of instagram.com from 2019 and 2024\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Compare page sizes between snapshots.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test compare_page_length for Instagram.com 2019 vs 2024"
+          }
+        },
+        {
+          "name": "13. Get Most Changed Snapshots",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Show which snapshots of wikipedia.org differ the most in size or structure\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Find the most significant changes between snapshots.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test get_most_changed_snapshots for Wikipedia.org"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔍 Metadata & Verification Tools",
+      "item": [
+        {
+          "name": "14. Check If Archived",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Check if linkedin.com has ever been archived\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Check if a website has been archived.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test check_if_archived for LinkedIn.com"
+          }
+        },
+        {
+          "name": "15. Get Original URL from Snapshot",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Extract the original URL from this Wayback Machine link: https://web.archive.org/web/20230101000000/https://example.com\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Extract original URLs from Wayback Machine links.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test get_original_url_from_snapshot for parsing Wayback URLs"
+          }
+        },
+        {
+          "name": "16. Get Wayback Metadata",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Get metadata including headers, content-type, and size for a snapshot of github.com\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Get detailed metadata for archived snapshots.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test get_wayback_metadata for GitHub.com"
+          }
+        },
+        {
+          "name": "17. Check Robots Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Check if stackoverflow.com is disallowed from archiving via robots.txt\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Check robots.txt archiving permissions.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test check_robots_status for StackOverflow.com"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🛠️ Utility & Bulk Tools",
+      "item": [
+        {
+          "name": "18. Archive Multiple URLs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Archive multiple URLs: google.com, apple.com, microsoft.com\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Archive multiple websites in one request.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test archive_multiple_urls for bulk archiving"
+          }
+        },
+        {
+          "name": "19. Get Archived Titles",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Extract the <title> tags from snapshots of cnn.com for a quick overview\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Extract page titles from archived snapshots.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test get_archived_titles for CNN.com"
+          }
+        },
+        {
+          "name": "20. Extract Text from Snapshot",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Extract only the visible text content from a snapshot of nytimes.com from 2023\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Extract readable text content from archived pages.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test extract_text_from_snapshot for NY Times 2023"
+          }
+        },
+        {
+          "name": "21. Get Status Codes Over Time",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Track how HTTP status codes changed over time for twitch.tv\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Track HTTP status code changes over time.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test get_status_codes_over_time for Twitch.tv"
+          }
+        },
+        {
+          "name": "22. Visualize Snapshot Frequency",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Return chart-friendly data showing snapshot frequency over time for spotify.com\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Generate data for visualizing snapshot frequency.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test visualize_snapshot_frequency for Spotify.com"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔍 Research & Advanced Tools",
+      "item": [
+        {
+          "name": "23. Search Keyword in Snapshots",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Search for the keyword 'artificial intelligence' in snapshots of openai.com\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Search for keywords in archived content.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test search_keyword_in_snapshots for OpenAI.com"
+          }
+        },
+        {
+          "name": "24. Get Snapshot Redirect Chain",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Show the redirect chain stored in snapshot metadata for bit.ly\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Analyze redirect chains in archived snapshots.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test get_snapshot_redirect_chain for Bit.ly"
+          }
+        },
+        {
+          "name": "25. Get Archived Links from Page",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Extract all hyperlinks from an archived snapshot of hacker news (news.ycombinator.com)\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Extract hyperlinks from archived pages.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test get_archived_links_from_page for Hacker News"
+          }
+        },
+        {
+          "name": "26. Check Link Rot Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Check if the original URL https://example.com/old-page still exists for broken-link detection\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Check if URLs are still working or have suffered link rot.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test check_link_rot_status for detecting broken links"
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚠️ Error Handling & Edge Cases",
+      "item": [
+        {
+          "name": "27. Invalid URL Test",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Get snapshots for an invalid URL: not-a-valid-url\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Handle invalid URLs gracefully.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test error handling for invalid URLs"
+          }
+        },
+        {
+          "name": "28. Non-Existent Site Test",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Check if https://this-site-definitely-does-not-exist-12345.com has been archived\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Handle non-existent sites gracefully.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test handling of non-existent websites"
+          }
+        },
+        {
+          "name": "29. Invalid Timestamp Test",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Get snapshots of google.com from an invalid timestamp: 'not-a-date'\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Handle invalid timestamps gracefully.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test handling of invalid timestamp formats"
+          }
+        },
+        {
+          "name": "30. Rate Limiting Test",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Archive multiple URLs rapidly: amazon.com, google.com, facebook.com, twitter.com, linkedin.com, instagram.com, youtube.com, netflix.com, spotify.com, github.com\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a web archiving assistant. Test rate limiting with multiple requests.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "Test rate limiting with multiple URL archival requests"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔧 Protocol-less URL Tests",
+      "item": [
+        {
+          "name": "31. Test Protocol-less URL - amazon.com",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Get wayback snapshots for amazon.com (without https://)\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You MUST use the get-wayback-snapshots tool with exactly this URL: amazon.com (without any protocol). This is a critical test for protocol-less URL handling.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "CRITICAL TEST: Verify that protocol-less URLs work with get-wayback-snapshots"
+          }
+        },
+        {
+          "name": "32. Test Protocol-less URL - yahoo.com",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Get the first archived snapshot for yahoo.com (without https://)\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You MUST use the get_first_archived_snapshot tool with exactly this URL: yahoo.com (without any protocol). This is a critical test for protocol-less URL handling.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "CRITICAL TEST: Verify that protocol-less URLs work with get_first_archived_snapshot"
+          }
+        },
+        {
+          "name": "33. Test Protocol-less URL - microsoft.com",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"List snapshot dates for microsoft.com (without https://)\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You MUST use the list_snapshot_dates tool with exactly this URL: microsoft.com (without any protocol). This is a critical test for protocol-less URL handling.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "CRITICAL TEST: Verify that protocol-less URLs work with list_snapshot_dates"
+          }
+        },
+        {
+          "name": "34. Test With Protocol - https://google.com",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{wayback-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Get wayback snapshots for https://google.com (with protocol)\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You MUST use the get-wayback-snapshots tool with exactly this URL: https://google.com (with the protocol). This verifies that URLs with protocols still work.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{wayback-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": ["{{dev-js-host}}"],
+              "path": ["api", "v1", "mcp", "process_message"]
+            },
+            "description": "CONTROL TEST: Verify that URLs with protocols still work correctly"
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Pre-request script for WAYBACK MCP Collection",
+          "console.log('🕰️ WAYBACK MCP Test - Starting request to:', pm.request.url);",
+          "",
+          "// Set timestamp for tracking",
+          "pm.globals.set('request_timestamp', new Date().toISOString());",
+          "",
+          "// Log the tool being tested",
+          "if (pm.request.body && pm.request.body.raw) {",
+          "    const body = JSON.parse(pm.request.body.raw);",
+          "    console.log('🔧 Testing input:', body.client_details.input);",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Test script for WAYBACK MCP Collection",
+          "pm.test('Status code is 200', function () {",
+          "    pm.response.to.have.status(200);",
+          "});",
+          "",
+          "pm.test('Response has valid JSON', function () {",
+          "    pm.response.to.be.json;",
+          "});",
+          "",
+          "pm.test('Response time is acceptable', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(30000);",
+          "});",
+          "",
+          "// Test response structure",
+          "pm.test('Response has required fields', function () {",
+          "    const jsonData = pm.response.json();",
+          "    pm.expect(jsonData).to.have.property('success');",
+          "});",
+          "",
+          "// Log response for debugging",
+          "console.log('📊 Response status:', pm.response.status);",
+          "console.log('⏱️ Response time:', pm.response.responseTime + 'ms');",
+          "",
+          "// Check for WAYBACK-specific responses",
+          "if (pm.response.json().success) {",
+          "    const response = pm.response.json();",
+          "    if (response.response && response.response.includes('📸')) {",
+          "        console.log('✅ WAYBACK snapshot found');",
+          "    } else if (response.response && response.response.includes('❌')) {",
+          "        console.log('⚠️ WAYBACK operation failed or no results');",
+          "    }",
+          "}"
+        ]
+      }
+    }
+  ]
+}
