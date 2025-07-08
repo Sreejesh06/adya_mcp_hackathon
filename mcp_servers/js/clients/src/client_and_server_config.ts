@@ -29,11 +29,6 @@ export const ServersConfig: any = [
     server_name: "CODE-RESEARCH",
     server_features_and_capability: "CODE-RESEARCH - Comprehensive developer resource search across 13 platforms: GitHub, NPM, PyPI, Stack Overflow, MDN, Rust Crates, Go Packages, DevDocs, Awesome Lists, Reddit Programming, YouTube Tutorials, Tech Blogs, and unified search across all platforms",
     path: "build/index.js", // CODE-RESEARCH build
-  },
-  {
-    server_name: "BIGGO",
-    server_features_and_capability: "BIGGO",
-    path: "build/index.js", // BigGo build
   }
 ];
 

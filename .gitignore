@@ -69,3 +69,7 @@ secrets.json
 # Build output
 build/
 dist/
+
+# Specific .env files that should never be committed
+mcp_servers/js/servers/*/.env
+mcp_servers/python/servers/*/.env

@@ -1014,15 +1014,6 @@ async function CallAndExecuteTool(selected_server:any, server_credentials:any,to
             // search_tech_blogs - these use public APIs and don't need credentials
             
             break;
-        case "BIGGO":
-            // BigGo credentials can be passed via args for flexibility
-            // Server will use these if provided, otherwise fall back to environment variables
-            args["__credentials__"] = {
-                "client_id": server_credentials[selected_server]?.client_id || server_credentials[selected_server]?.BIGGO_MCP_SERVER_CLIENT_ID || "",
-                "client_secret": server_credentials[selected_server]?.client_secret || server_credentials[selected_server]?.BIGGO_MCP_SERVER_CLIENT_SECRET || "",
-                "region": server_credentials[selected_server]?.region || server_credentials[selected_server]?.BIGGO_MCP_SERVER_REGION || "TW"
-            };
-            break;
         case "OMNISEARCH":
             // Dynamic credential injection for OMNISEARCH server
             // Pass credentials directly as tool arguments
