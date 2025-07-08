@@ -21,13 +21,29 @@ This repository contains template files with placeholder values. **DO NOT** repl
 
 ### 🔑 **Required API Keys**
 
-For testing the CODE-RESEARCH MCP server, you'll need:
+For testing the MCP servers, you'll need:
 
+**CODE-RESEARCH Server:**
 - **GitHub Personal Access Token**: For `search_github` and `search_awesome_lists` tools
 - **NPM Token**: For `search_npm` tool
 - **Stack Overflow Access Token**: For `search_stackoverflow` tool (optional)
 - **YouTube API Key**: For `search_youtube_tutorials` tool
 - **Gemini API Key**: For AI-powered function calling
+
+**OMNISEARCH Server:**
+- **Tavily API Key**: For search functionality
+- **Brave API Key**: For Brave search
+- **Kagi API Key**: For Kagi search
+- **Perplexity API Key**: For AI responses
+- **Jina API Key**: For content processing
+- **Firecrawl API Key**: For web crawling
+
+**PINTEREST Server:**
+- **Pinterest Client ID**: For OAuth authentication
+- **Pinterest Client Secret**: For OAuth authentication
+
+**WAYBACK and WORDPRESS Servers:**
+- No API keys required (use public APIs)
 
 ### 🛡️ **How to Set Up Credentials Safely**
 
