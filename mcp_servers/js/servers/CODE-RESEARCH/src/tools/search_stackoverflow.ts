@@ -48,11 +48,12 @@ interface StackOverflowOAuthResponse {
   token_type: string;
 }
 
-// OAuth configuration
+// OAuth configuration - these are now for reference only
+// In production, OAuth would be handled by the calling application
 const STACK_OAUTH_CONFIG = {
-  clientId: process.env.STACK_CLIENT_ID || '',
-  clientSecret: process.env.STACK_CLIENT_SECRET || '',
-  redirectUri: process.env.STACK_REDIRECT_URI || 'http://localhost:3000/oauth/callback',
+  clientId: '',
+  clientSecret: '',
+  redirectUri: 'http://localhost:3000/oauth/callback',
   scope: 'read_inbox',
   authUrl: 'https://stackoverflow.com/oauth',
   tokenUrl: 'https://stackoverflow.com/oauth/access_token/json',
@@ -111,6 +112,9 @@ export function createStackOverflowSearchTool(server: any) {
     "search_stackoverflow",
     "Search Stack Overflow for programming questions and answers using the StackExchange API",
     {
+      stackoverflow_access_token: z.string().optional().describe("Stack Overflow Access Token (optional - for higher rate limits)"),
+      stackoverflow_client_id: z.string().optional().describe("Stack Overflow OAuth Client ID (optional - for authenticated access)"),
+      stackoverflow_client_secret: z.string().optional().describe("Stack Overflow OAuth Client Secret (optional - for authenticated access)"),
       query: z.string().describe("Search query for Stack Overflow questions"),
       limit: z.number().min(1).max(100).optional().default(10).describe("Maximum number of results to return"),
       sort: z.enum(["activity", "votes", "creation", "relevance"]).optional().default("relevance").describe("Sort order for results"),
@@ -131,6 +135,9 @@ export function createStackOverflowSearchTool(server: any) {
       wiki: z.boolean().optional().describe("Only show community wiki questions"),
     },
     async ({ 
+      stackoverflow_access_token,
+      stackoverflow_client_id,
+      stackoverflow_client_secret,
       query, 
       limit, 
       sort, 
@@ -150,6 +157,9 @@ export function createStackOverflowSearchTool(server: any) {
       views, 
       wiki 
     }: {
+      stackoverflow_access_token?: string;
+      stackoverflow_client_id?: string;
+      stackoverflow_client_secret?: string;
       query: string;
       limit: number;
       sort: string;
@@ -186,18 +196,45 @@ export function createStackOverflowSearchTool(server: any) {
           };
         }
 
-        // Get OAuth token
-        const token = await getOAuthToken();
-
         // Prepare headers
         const headers: Record<string, string> = {
           'Accept': 'application/json',
           'User-Agent': 'CODE-RESEARCH-MCP-Server'
         };
 
-        // Add OAuth token if available
-        if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
+        // Add OAuth token if provided
+        if (stackoverflow_access_token) {
+          headers['Authorization'] = `Bearer ${stackoverflow_access_token}`;
+        }
+
+        // Handle OAuth flow with client credentials if provided
+        let authToken = stackoverflow_access_token;
+        if (!authToken && stackoverflow_client_id && stackoverflow_client_secret) {
+          try {
+            // Use client credentials grant type for OAuth
+            const tokenResponse = await axios.post(
+              'https://stackoverflow.com/oauth/access_token/json',
+              {
+                client_id: stackoverflow_client_id,
+                client_secret: stackoverflow_client_secret,
+                grant_type: 'client_credentials',
+                scope: 'read_inbox'
+              },
+              {
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                timeout: 10000
+              }
+            );
+            
+            if (tokenResponse.data.access_token) {
+              authToken = tokenResponse.data.access_token;
+              headers['Authorization'] = `Bearer ${authToken}`;
+            }
+          } catch (oauthError) {
+            console.warn('OAuth token request failed, falling back to anonymous access:', oauthError);
+          }
         }
 
         // Build search parameters

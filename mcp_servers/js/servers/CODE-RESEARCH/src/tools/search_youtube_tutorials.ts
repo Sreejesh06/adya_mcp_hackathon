@@ -72,31 +72,20 @@ export function createYoutubeTutorialsSearchTool(server: any) {
     "search_youtube_tutorials",
     "Search YouTube for programming tutorials using YouTube Data API v3",
     {
+      youtube_api_key: z.string().describe("YouTube Data API v3 Key"),
       query: z.string().describe("Search query for programming tutorials"),
       duration: z.enum(["short", "medium", "long"]).optional().describe("Filter by video duration"),
       upload_date: z.enum(["hour", "today", "week", "month", "year"]).optional().describe("Filter by upload date"),
       limit: z.number().min(1).max(10).optional().default(5).describe("Maximum number of results to return (1-10)"),
     },
-    async ({ query, duration, upload_date, limit }: {
+    async ({ youtube_api_key, query, duration, upload_date, limit }: {
+      youtube_api_key: string;
       query: string;
       duration?: string;
       upload_date?: string;
       limit: number;
     }) => {
       try {
-        // Check for YouTube API key
-        const youtubeApiKey = process.env.YOUTUBE_API_KEY;
-        if (!youtubeApiKey) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: "YouTube API key is required. Please set YOUTUBE_API_KEY environment variable.\n\nYou can get one from: https://console.cloud.google.com/apis/credentials",
-              },
-            ],
-          };
-        }
-
         // Create cache key
         const cacheKey = `youtube:${query}:${duration || 'any'}:${upload_date || 'any'}:${limit}`;
         
@@ -128,7 +117,7 @@ export function createYoutubeTutorialsSearchTool(server: any) {
           q: searchQuery,
           type: 'video',
           maxResults: limit.toString(),
-          key: youtubeApiKey,
+          key: youtube_api_key,
           videoEmbeddable: 'true',
           relevanceLanguage: 'en'
         };
@@ -197,7 +186,7 @@ export function createYoutubeTutorialsSearchTool(server: any) {
             params: {
               part: 'statistics,contentDetails',
               id: videoIds.join(','),
-              key: youtubeApiKey
+              key: youtube_api_key
             },
             timeout: 15000
           }
@@ -268,7 +257,7 @@ export function createYoutubeTutorialsSearchTool(server: any) {
         
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 403) {
-            errorMessage = 'YouTube API quota exceeded or invalid API key. Please check your YOUTUBE_API_KEY.';
+            errorMessage = 'YouTube API quota exceeded or invalid API key. Please check your youtube_api_key parameter.';
           } else if (error.response?.status === 400) {
             errorMessage = 'Invalid YouTube API request. Please check your parameters.';
           } else if (error.response?.status === 429) {

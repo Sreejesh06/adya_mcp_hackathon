@@ -1,0 +1,482 @@
+{
+  "info": {
+    "_postman_id": "code-research-dynamic-mcp-collection",
+    "name": "CODE-RESEARCH Dynamic MCP Server - All 13 Tools",
+    "description": "Complete Postman collection for testing all 13 CODE-RESEARCH MCP server tools with dynamic credential passing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Dynamic Search Tools (All 13 Tools)",
+      "description": "Test dynamic credential passing for all CODE-RESEARCH tools",
+      "item": [
+        {
+          "name": "1. GitHub Search (Dynamic)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{code-research-server}}\": {\n            \"GITHUB_TOKEN\": \"{{github-token}}\"\n        }\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Search GitHub for React component libraries\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a code research assistant. Find the best React component libraries on GitHub.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{code-research-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": [
+                "{{dev-js-host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "mcp",
+                "process_message"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2. NPM Search (Dynamic)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{code-research-server}}\": {\n            \"NPM_TOKEN\": \"{{npm-token}}\"\n        }\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Search NPM for Express.js middleware packages\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a code research assistant. Find the best Express.js middleware packages on NPM.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{code-research-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": [
+                "{{dev-js-host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "mcp",
+                "process_message"
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. PyPI Search (No Credentials)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{code-research-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Search PyPI for Django REST framework packages\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a code research assistant. Find the best Django REST framework packages on PyPI.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{code-research-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": [
+                "{{dev-js-host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "mcp",
+                "process_message"
+              ]
+            }
+          }
+        },
+        {
+          "name": "4. Stack Overflow Search (Dynamic)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{code-research-server}}\": {\n            \"STACKOVERFLOW_ACCESS_TOKEN\": \"{{stackoverflow-access-token}}\",\n            \"STACKOVERFLOW_CLIENT_ID\": \"{{stackoverflow-client-id}}\",\n            \"STACKOVERFLOW_CLIENT_SECRET\": \"{{stackoverflow-client-secret}}\"\n        }\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Search Stack Overflow for React hooks best practices\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a code research assistant. Find the best Stack Overflow answers about React hooks.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{code-research-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": [
+                "{{dev-js-host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "mcp",
+                "process_message"
+              ]
+            }
+          }
+        },
+        {
+          "name": "5. MDN Search (No Credentials)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{code-research-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Search MDN for JavaScript async/await documentation\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a code research assistant. Find MDN documentation about JavaScript async/await.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{code-research-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": [
+                "{{dev-js-host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "mcp",
+                "process_message"
+              ]
+            }
+          }
+        },
+        {
+          "name": "6. Search All Platforms (Dynamic)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{code-research-server}}\": {\n            \"GITHUB_TOKEN\": \"{{github-token}}\",\n            \"NPM_TOKEN\": \"{{npm-token}}\",\n            \"STACKOVERFLOW_ACCESS_TOKEN\": \"{{stackoverflow-access-token}}\",\n            \"STACKOVERFLOW_CLIENT_ID\": \"{{stackoverflow-client-id}}\",\n            \"STACKOVERFLOW_CLIENT_SECRET\": \"{{stackoverflow-client-secret}}\",\n            \"YOUTUBE_API_KEY\": \"{{youtube-api-key}}\"\n        }\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Search all platforms for Node.js authentication libraries\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a code research assistant. Search across all platforms for Node.js authentication libraries and provide recommendations.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{code-research-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": [
+                "{{dev-js-host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "mcp",
+                "process_message"
+              ]
+            }
+          }
+        },
+        {
+          "name": "7. Rust Crates Search (No Credentials)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{code-research-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Search Rust crates for async HTTP client libraries\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a code research assistant. Find the best Rust crates for async HTTP client libraries.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{code-research-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": [
+                "{{dev-js-host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "mcp",
+                "process_message"
+              ]
+            }
+          }
+        },
+        {
+          "name": "8. Go Packages Search (No Credentials)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{code-research-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Search Go packages for web framework libraries\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a code research assistant. Find the best Go packages for web framework libraries.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{code-research-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": [
+                "{{dev-js-host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "mcp",
+                "process_message"
+              ]
+            }
+          }
+        },
+        {
+          "name": "9. DevDocs Search (No Credentials)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{code-research-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Search DevDocs for Python asyncio documentation\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a code research assistant. Find DevDocs documentation about Python asyncio.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{code-research-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": [
+                "{{dev-js-host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "mcp",
+                "process_message"
+              ]
+            }
+          }
+        },
+        {
+          "name": "10. Awesome Lists Search (Dynamic)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{code-research-server}}\": {\n            \"GITHUB_TOKEN\": \"{{github-token}}\"\n        }\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Search awesome lists for machine learning resources\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a code research assistant. Find the best machine learning resources from awesome lists.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{code-research-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": [
+                "{{dev-js-host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "mcp",
+                "process_message"
+              ]
+            }
+          }
+        },
+        {
+          "name": "11. Reddit Programming Search (No Credentials)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{code-research-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Search Reddit programming for best practices discussions\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a code research assistant. Find the best Reddit programming discussions about best practices.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{code-research-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": [
+                "{{dev-js-host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "mcp",
+                "process_message"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12. YouTube Tutorials Search (Dynamic)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{code-research-server}}\": {\n            \"YOUTUBE_API_KEY\": \"{{youtube-api-key}}\"\n        }\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Search YouTube for React tutorial videos\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a code research assistant. Find the best React tutorial videos on YouTube.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{code-research-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": [
+                "{{dev-js-host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "mcp",
+                "process_message"
+              ]
+            }
+          }
+        },
+        {
+          "name": "13. Tech Blogs Search (No Credentials)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"selected_server_credentials\": {\n        \"{{code-research-server}}\": {}\n    },\n    \"client_details\": {\n        \"api_key\": \"{{gemini-api-key}}\",\n        \"temperature\": 0.1,\n        \"max_token\": 20000,\n        \"input\": \"Search tech blogs for microservices architecture articles\",\n        \"input_type\": \"text\",\n        \"prompt\": \"You are a code research assistant. Find the best tech blog articles about microservices architecture.\",\n        \"chat_model\": \"gemini-2.0-flash-lite\",\n        \"chat_history\": []\n    },\n    \"selected_client\": \"MCP_CLIENT_GEMINI\",\n    \"selected_servers\": [\n        \"{{code-research-server}}\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{dev-js-host}}/api/v1/mcp/process_message",
+              "host": [
+                "{{dev-js-host}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "mcp",
+                "process_message"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "GITHUB_TOKEN",
+      "value": "YOUR_GITHUB_TOKEN_HERE",
+      "type": "string"
+    },
+    {
+      "key": "NPM_TOKEN",
+      "value": "YOUR_NPM_TOKEN_HERE",
+      "type": "string"
+    },
+    {
+      "key": "STACKOVERFLOW_ACCESS_TOKEN",
+      "value": "YOUR_STACKOVERFLOW_ACCESS_TOKEN_HERE",
+      "type": "string"
+    },
+    {
+      "key": "STACKOVERFLOW_CLIENT_ID",
+      "value": "YOUR_STACKOVERFLOW_CLIENT_ID_HERE",
+      "type": "string"
+    },
+    {
+      "key": "STACKOVERFLOW_CLIENT_SECRET",
+      "value": "YOUR_STACKOVERFLOW_CLIENT_SECRET_HERE",
+      "type": "string"
+    },
+    {
+      "key": "YOUTUBE_API_KEY",
+      "value": "YOUR_YOUTUBE_API_KEY_HERE",
+      "type": "string"
+    },
+    {
+      "key": "GEMINI_API_KEY",
+      "value": "YOUR_GEMINI_API_KEY_HERE",
+      "type": "string"
+    }
+  ]
+}

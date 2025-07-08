@@ -80,9 +80,18 @@ export async function ClientAndServerExecution(payload:any, streaming_callback:a
         You are an ${selected_server} AI assistant that analyzes user requests and determines if they require tool calls from available tools.
         Available tools: ${JSON.stringify(tool_call_details_arr)}
         
-        IMPORTANT: The ${selected_server} server is SPECIFICALLY DESIGNED to handle these types of requests. When users ask for web archiving, snapshot retrieval, or Wayback Machine operations, you should ALWAYS return TRUE and select the appropriate tools.
-
-        Common request patterns that should return TRUE:
+        IMPORTANT: The ${selected_server} server is SPECIFICALLY DESIGNED to handle these types of requests.
+        
+        For CODE-RESEARCH server, return TRUE for requests about:
+        - Searching GitHub repositories, packages, or code
+        - Finding npm packages or libraries
+        - Searching Stack Overflow for coding questions
+        - Looking up documentation or tutorials
+        - Finding awesome lists or curated resources
+        - Any coding or development-related research
+        
+        For WAYBACK server, return TRUE for requests about:
+        - Web archiving, snapshot retrieval, or Wayback Machine operations
         - "get first archived snapshot" → get_first_archived_snapshot
         - "get snapshots" or "find snapshots" → get-wayback-snapshots
         - "list snapshot dates" → list_snapshot_dates
@@ -92,7 +101,7 @@ export async function ClientAndServerExecution(payload:any, streaming_callback:a
         - "check if archived" → check_if_archived
         - Any mention of "wayback", "archive", "snapshot", "historical version"
 
-        Return TRUE for tool calls when the request clearly relates to web archiving or snapshot retrieval.
+        Return TRUE for tool calls when the request clearly relates to the server's capabilities.
         Return FALSE only when the request is completely unrelated to ${selected_server} capabilities.
         
         Output format (MUST be exact):
@@ -151,7 +160,9 @@ export async function ClientAndServerExecution(payload:any, streaming_callback:a
                         final_tool_calls.push(matchingTool);
                     }
                 }
-                client_details.prompt = temp_prompt;
+                client_details.prompt = selected_server === "CODE-RESEARCH" 
+                    ? "You are a code research assistant. You have access to function calling tools. When you need to search for information, you must call the appropriate function directly. Do NOT generate code - call the actual functions. Available functions: search_github, search_npm, search_stackoverflow, search_youtube_tutorials, search_awesome_lists, search_all. Use these functions directly to get real data."
+                    : temp_prompt;
                 client_details.tools = final_tool_calls;
                 while(true){
                     let response:LlmResponseStruct = await AzureOpenAIProcessor(client_details);
@@ -362,7 +373,9 @@ export async function ClientAndServerExecution(payload:any, streaming_callback:a
                     }
                 }
 
-                client_details.prompt = temp_prompt;
+                client_details.prompt = selected_server === "CODE-RESEARCH" 
+                    ? "You are a code research assistant. You have access to function calling tools. When you need to search for information, you must call the appropriate function directly. Do NOT generate code - call the actual functions. Available functions: search_github, search_npm, search_stackoverflow, search_youtube_tutorials, search_awesome_lists, search_all. Use these functions directly to get real data."
+                    : temp_prompt;
                 client_details.tools = final_tool_calls;
                 while(true){
 
@@ -372,6 +385,12 @@ export async function ClientAndServerExecution(payload:any, streaming_callback:a
                         ClientAndServerExecution.Status = response.Status;
                         return ClientAndServerExecution
                     }
+                    
+                    // Debug logging for Gemini tool call response
+                    console.log("🔍 DEBUG (Gemini Tool Call): Full response:", JSON.stringify(response.Data?.final_llm_response, null, 2));
+                    console.log("🔍 DEBUG (Gemini Tool Call): Output type:", response.Data?.output_type);
+                    console.log("🔍 DEBUG (Gemini Tool Call): Messages:", response.Data?.messages);
+                    
                     ClientAndServerExecution.Data.total_llm_calls += 1;
                     ClientAndServerExecution.Data.total_tokens += response.Data?.total_tokens || 0;
                     ClientAndServerExecution.Data.total_input_tokens += response.Data?.total_input_tokens || 0;
@@ -595,7 +614,9 @@ export async function ClientAndServerExecution(payload:any, streaming_callback:a
                         final_tool_calls.push(matchingTool);
                     }
                 }
-                client_details.prompt = temp_prompt;
+                client_details.prompt = selected_server === "CODE-RESEARCH" 
+                    ? "You are a code research assistant. You have access to function calling tools. When you need to search for information, you must call the appropriate function directly. Do NOT generate code - call the actual functions. Available functions: search_github, search_npm, search_stackoverflow, search_youtube_tutorials, search_awesome_lists, search_all. Use these functions directly to get real data."
+                    : temp_prompt;
                 client_details.tools = final_tool_calls;
                 while(true){
                     let response:LlmResponseStruct = await OpenAIProcessor(client_details);
@@ -933,9 +954,65 @@ async function CallAndExecuteTool(selected_server:any, server_credentials:any,to
             // All tools work with public API endpoints
             break;
         case "CODE-RESEARCH":
-            // CODE-RESEARCH doesn't require credentials for basic operations
-            // All tools work with public API endpoints
-            // GitHub token can be provided via environment variable GITHUB_TOKEN for higher rate limits
+            // Tool-specific credential injection for CODE-RESEARCH server
+            // Only pass relevant credentials to each tool based on the tool name
+            const codeResearchCreds = server_credentials[selected_server] || {};
+            
+            // GitHub-related tools
+            if (tool_name === "search_github" && codeResearchCreds.GITHUB_TOKEN) {
+                args.github_token = codeResearchCreds.GITHUB_TOKEN;
+            }
+            
+            // NPM-related tools
+            if (tool_name === "search_npm" && codeResearchCreds.NPM_TOKEN) {
+                args.npm_token = codeResearchCreds.NPM_TOKEN;
+            }
+            
+            // Stack Overflow tools
+            if (tool_name === "search_stackoverflow") {
+                if (codeResearchCreds.STACKOVERFLOW_ACCESS_TOKEN) {
+                    args.stackoverflow_access_token = codeResearchCreds.STACKOVERFLOW_ACCESS_TOKEN;
+                }
+                if (codeResearchCreds.STACKOVERFLOW_CLIENT_ID) {
+                    args.stackoverflow_client_id = codeResearchCreds.STACKOVERFLOW_CLIENT_ID;
+                }
+                if (codeResearchCreds.STACKOVERFLOW_CLIENT_SECRET) {
+                    args.stackoverflow_client_secret = codeResearchCreds.STACKOVERFLOW_CLIENT_SECRET;
+                }
+            }
+            
+            // YouTube tutorial tools
+            if (tool_name === "search_youtube_tutorials" && codeResearchCreds.YOUTUBE_API_KEY) {
+                args.youtube_api_key = codeResearchCreds.YOUTUBE_API_KEY;
+            }
+            
+            // Tools that use multiple credentials (search_all, etc.)
+            if (tool_name === "search_all") {
+                if (codeResearchCreds.GITHUB_TOKEN) {
+                    args.github_token = codeResearchCreds.GITHUB_TOKEN;
+                }
+                if (codeResearchCreds.NPM_TOKEN) {
+                    args.npm_token = codeResearchCreds.NPM_TOKEN;
+                }
+                if (codeResearchCreds.STACKOVERFLOW_ACCESS_TOKEN) {
+                    args.stackoverflow_access_token = codeResearchCreds.STACKOVERFLOW_ACCESS_TOKEN;
+                }
+                if (codeResearchCreds.STACKOVERFLOW_CLIENT_ID) {
+                    args.stackoverflow_client_id = codeResearchCreds.STACKOVERFLOW_CLIENT_ID;
+                }
+                if (codeResearchCreds.STACKOVERFLOW_CLIENT_SECRET) {
+                    args.stackoverflow_client_secret = codeResearchCreds.STACKOVERFLOW_CLIENT_SECRET;
+                }
+                if (codeResearchCreds.YOUTUBE_API_KEY) {
+                    args.youtube_api_key = codeResearchCreds.YOUTUBE_API_KEY;
+                }
+            }
+            
+            // Tools that don't require credentials (public APIs)
+            // search_pypi, search_mdn, search_rust_crates, search_go_packages, 
+            // search_devdocs, search_awesome_lists, search_reddit_programming, 
+            // search_tech_blogs - these use public APIs and don't need credentials
+            
             break;
         case "BIGGO":
             // BigGo credentials can be passed via args for flexibility
@@ -945,6 +1022,29 @@ async function CallAndExecuteTool(selected_server:any, server_credentials:any,to
                 "client_secret": server_credentials[selected_server]?.client_secret || server_credentials[selected_server]?.BIGGO_MCP_SERVER_CLIENT_SECRET || "",
                 "region": server_credentials[selected_server]?.region || server_credentials[selected_server]?.BIGGO_MCP_SERVER_REGION || "TW"
             };
+            break;
+        case "OMNISEARCH":
+            // Dynamic credential injection for OMNISEARCH server
+            // Pass credentials directly as tool arguments
+            const omnisearchCreds = server_credentials[selected_server] || {};
+            if (omnisearchCreds.TAVILY_API_KEY) {
+                args.tavily_api_key = omnisearchCreds.TAVILY_API_KEY;
+            }
+            if (omnisearchCreds.BRAVE_API_KEY) {
+                args.brave_api_key = omnisearchCreds.BRAVE_API_KEY;
+            }
+            if (omnisearchCreds.KAGI_API_KEY) {
+                args.kagi_api_key = omnisearchCreds.KAGI_API_KEY;
+            }
+            if (omnisearchCreds.PERPLEXITY_API_KEY) {
+                args.perplexity_api_key = omnisearchCreds.PERPLEXITY_API_KEY;
+            }
+            if (omnisearchCreds.JINA_API_KEY) {
+                args.jina_api_key = omnisearchCreds.JINA_API_KEY;
+            }
+            if (omnisearchCreds.FIRECRAWL_API_KEY) {
+                args.firecrawl_api_key = omnisearchCreds.FIRECRAWL_API_KEY;
+            }
             break;
     
 

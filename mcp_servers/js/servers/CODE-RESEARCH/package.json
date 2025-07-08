@@ -1,24 +1,30 @@
 {
-  "name": "mcp-code-research",
-  "version": "1.0.0",
-  "description": "MCP server for searching developer resources including GitHub, npm, PyPI, Stack Overflow, and MDN",
+  "name": "mcp-code-research-dynamic",
+  "version": "2.0.0",
+  "description": "MCP server for searching developer resources with dynamic credential passing - supports GitHub, npm, PyPI, Stack Overflow, MDN, and more",
   "main": "build/index.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
     "dev": "ts-node src/index.ts",
     "watch": "tsc --watch",
-    "start": "node build/index.js"
+    "start": "node build/index.js",
+    "http-server": "node http-server.js",
+    "test": "npm run build && npm run http-server"
   },
   "keywords": [
     "mcp",
     "model-context-protocol",
     "code-search",
+    "dynamic-credentials",
     "github",
     "npm",
     "pypi",
     "stackoverflow",
-    "mdn"
+    "mdn",
+    "youtube",
+    "rust-crates",
+    "go-packages"
   ],
   "author": "CODE-RESEARCH MCP Team",
   "license": "MIT",
@@ -26,6 +32,8 @@
     "@modelcontextprotocol/sdk": "^1.15.0",
     "axios": "^1.6.0",
     "cheerio": "^1.1.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
     "node-cache": "^5.1.2",
     "zod": "^3.22.4"
   },

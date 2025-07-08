@@ -178,13 +178,15 @@ export function createNpmSearchTool(server: any) {
     "search_npm",
     "Search npm packages using the npm registry API",
     {
+      npm_token: z.string().optional().describe("NPM Registry Token (optional - for authenticated requests)"),
       query: z.string().describe("Search query for npm packages"),
       limit: z.number().min(1).max(100).optional().default(10).describe("Maximum number of results to return"),
       quality: z.number().min(0).max(1).optional().default(0.65).describe("Minimum quality score (0-1)"),
       popularity: z.number().min(0).max(1).optional().default(0.98).describe("Minimum popularity score (0-1)"),
       maintenance: z.number().min(0).max(1).optional().default(0.5).describe("Minimum maintenance score (0-1)"),
     },
-    async ({ query, limit, quality, popularity, maintenance }: {
+    async ({ npm_token, query, limit, quality, popularity, maintenance }: {
+      npm_token?: string;
       query: string;
       limit: number;
       quality: number;
@@ -214,10 +216,9 @@ export function createNpmSearchTool(server: any) {
           'User-Agent': 'CODE-RESEARCH-MCP-Server'
         };
 
-        // Add npm token if available
-        const npmToken = process.env.NPM_TOKEN;
-        if (npmToken) {
-          headers['Authorization'] = `Bearer ${npmToken}`;
+        // Add npm token if provided
+        if (npm_token) {
+          headers['Authorization'] = `Bearer ${npm_token}`;
         }
 
         // Make API request to npm search
@@ -295,7 +296,7 @@ export function createNpmSearchTool(server: any) {
           if (error.response?.status === 429) {
             errorMessage = 'npm API rate limit exceeded. Please try again later.';
           } else if (error.response?.status === 401) {
-            errorMessage = 'npm API authentication failed. Please check your NPM_TOKEN.';
+            errorMessage = 'npm API authentication failed. Please check your npm_token parameter.';
           } else if (error.response?.status) {
             errorMessage = `npm API error: ${error.response.status} - ${error.response.statusText}`;
           } else if (error.code === 'ECONNABORTED') {

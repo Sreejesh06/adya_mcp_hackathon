@@ -34,13 +34,15 @@ export function createGitHubSearchTool(server: any) {
     "search_github",
     "Search GitHub repositories using the GitHub API",
     {
+      github_token: z.string().optional().describe("GitHub Personal Access Token (optional - for higher rate limits)"),
       query: z.string().describe("Search query for GitHub repositories"),
       limit: z.number().min(1).max(100).optional().default(10).describe("Maximum number of results to return"),
       sort: z.enum(["stars", "forks", "help-wanted-issues", "updated"]).optional().default("stars").describe("Sort order for results"),
       order: z.enum(["desc", "asc"]).optional().default("desc").describe("Sort direction"),
       language: z.string().optional().describe("Filter by programming language"),
     },
-    async ({ query, limit, sort, order, language }: {
+    async ({ github_token, query, limit, sort, order, language }: {
+      github_token?: string;
       query: string;
       limit: number;
       sort: string;
@@ -76,10 +78,9 @@ export function createGitHubSearchTool(server: any) {
           'User-Agent': 'CODE-RESEARCH-MCP-Server'
         };
 
-        // Add GitHub token if available
-        const githubToken = process.env.GITHUB_TOKEN;
-        if (githubToken) {
-          headers['Authorization'] = `Bearer ${githubToken}`;
+        // Add GitHub token if provided
+        if (github_token) {
+          headers['Authorization'] = `Bearer ${github_token}`;
         }
 
         // Make API request

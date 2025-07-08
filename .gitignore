@@ -50,3 +50,22 @@ Thumbs.db
 
 ./mcp_servers/python/clients/venv
 __pycache__
+
+# Environment files with real secrets
+*.env
+*.env.local
+*.env.production
+*.env.staging
+
+# Postman environment files with real tokens (keep template versions only)
+*postman_environment.json
+!*postman_environment.template.json
+
+# API keys and credentials
+api_keys.json
+credentials.json
+secrets.json
+
+# Build output
+build/
+dist/

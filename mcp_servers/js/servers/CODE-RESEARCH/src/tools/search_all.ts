@@ -22,6 +22,14 @@ export function createSearchAllTool(server: any) {
     "search_all",
     "Search across all available platforms simultaneously and aggregate results",
     {
+      // Credential parameters
+      github_token: z.string().optional().describe("GitHub Personal Access Token (optional)"),
+      npm_token: z.string().optional().describe("NPM Registry Token (optional)"),
+      stackoverflow_access_token: z.string().optional().describe("Stack Overflow Access Token (optional)"),
+      stackoverflow_client_id: z.string().optional().describe("Stack Overflow OAuth Client ID (optional)"),
+      stackoverflow_client_secret: z.string().optional().describe("Stack Overflow OAuth Client Secret (optional)"),
+      youtube_api_key: z.string().optional().describe("YouTube Data API v3 Key (optional)"),
+      // Search parameters
       query: z.string().describe("Search query to execute across all platforms"),
       limit: z.number().min(1).max(5).optional().default(3).describe("Maximum number of results per platform (1-5)"),
       platforms: z.array(z.enum([
@@ -30,7 +38,23 @@ export function createSearchAllTool(server: any) {
         "reddit_programming", "youtube_tutorials", "tech_blogs"
       ])).optional().describe("Specific platforms to search (default: all)"),
     },
-    async ({ query, limit, platforms }: {
+    async ({ 
+      github_token, 
+      npm_token, 
+      stackoverflow_access_token,
+      stackoverflow_client_id,
+      stackoverflow_client_secret,
+      youtube_api_key,
+      query, 
+      limit, 
+      platforms 
+    }: {
+      github_token?: string;
+      npm_token?: string;
+      stackoverflow_access_token?: string;
+      stackoverflow_client_id?: string;
+      stackoverflow_client_secret?: string;
+      youtube_api_key?: string;
       query: string;
       limit: number;
       platforms?: string[];
@@ -52,19 +76,19 @@ export function createSearchAllTool(server: any) {
           };
         }
 
-        // Define all available search functions
+        // Define all available search functions with credentials
         const searchFunctions = {
-          github: () => searchGitHub(query, limit),
-          npm: () => searchNpm(query, limit),
+          github: () => searchGitHub(query, limit, github_token),
+          npm: () => searchNpm(query, limit, npm_token),
           pypi: () => searchPyPI(query, limit),
-          stackoverflow: () => searchStackOverflow(query, limit),
+          stackoverflow: () => searchStackOverflow(query, limit, stackoverflow_access_token, stackoverflow_client_id, stackoverflow_client_secret),
           mdn: () => searchMDN(query, limit),
           rust_crates: () => searchRustCrates(query, limit),
           go_packages: () => searchGoPackages(query, limit),
           devdocs: () => searchDevDocs(query, limit),
-          awesome_lists: () => searchAwesomeLists(query, limit),
+          awesome_lists: () => searchAwesomeLists(query, limit, github_token),
           reddit_programming: () => searchRedditProgramming(query, limit),
-          youtube_tutorials: () => searchYoutubeTutorials(query, limit),
+          youtube_tutorials: () => searchYoutubeTutorials(query, limit, youtube_api_key),
           tech_blogs: () => searchTechBlogs(query, limit)
         };
 
@@ -177,15 +201,14 @@ export function createSearchAllTool(server: any) {
 }
 
 // Individual search functions that call the respective APIs
-async function searchGitHub(query: string, limit: number): Promise<string> {
+async function searchGitHub(query: string, limit: number, github_token?: string): Promise<string> {
   const headers: Record<string, string> = {
     'Accept': 'application/vnd.github.v3+json',
     'User-Agent': 'CODE-RESEARCH-MCP-Server'
   };
 
-  const githubToken = process.env.GITHUB_TOKEN;
-  if (githubToken) {
-    headers['Authorization'] = `Bearer ${githubToken}`;
+  if (github_token) {
+    headers['Authorization'] = `Bearer ${github_token}`;
   }
 
   const response = await axios.get(
@@ -210,10 +233,20 @@ async function searchGitHub(query: string, limit: number): Promise<string> {
   return results || 'No repositories found';
 }
 
-async function searchNpm(query: string, limit: number): Promise<string> {
+async function searchNpm(query: string, limit: number, npm_token?: string): Promise<string> {
+  const headers: Record<string, string> = {
+    'Accept': 'application/json',
+    'User-Agent': 'CODE-RESEARCH-MCP-Server'
+  };
+
+  if (npm_token) {
+    headers['Authorization'] = `Bearer ${npm_token}`;
+  }
+
   const response = await axios.get(
     `https://registry.npmjs.org/-/v1/search`,
     {
+      headers,
       params: {
         text: query,
         size: limit
@@ -241,17 +274,28 @@ async function searchPyPI(query: string, limit: number): Promise<string> {
   return `1. ${pkg.info.name} - ${pkg.info.summary || 'No description'} (📦${pkg.info.version})`;
 }
 
-async function searchStackOverflow(query: string, limit: number): Promise<string> {
+async function searchStackOverflow(query: string, limit: number, stackoverflow_access_token?: string, stackoverflow_client_id?: string, stackoverflow_client_secret?: string): Promise<string> {
+  const params: any = {
+    order: 'desc',
+    sort: 'activity',
+    intitle: query,
+    site: 'stackoverflow',
+    pagesize: limit
+  };
+
+  // Handle OAuth credentials
+  if (stackoverflow_access_token) {
+    params.access_token = stackoverflow_access_token;
+  } else if (stackoverflow_client_id && stackoverflow_client_secret) {
+    // For client credentials flow, we'd need to get an access token first
+    // For now, we'll use anonymous access but the credentials are available
+    console.log('Stack Overflow client credentials available for OAuth flow');
+  }
+
   const response = await axios.get(
     'https://api.stackexchange.com/2.3/search',
     {
-      params: {
-        order: 'desc',
-        sort: 'activity',
-        intitle: query,
-        site: 'stackoverflow',
-        pagesize: limit
-      },
+      params,
       timeout: 10000
     }
   );
@@ -310,15 +354,14 @@ async function searchDevDocs(query: string, limit: number): Promise<string> {
   return `Search DevDocs for "${query}" - Visit: https://devdocs.io/?q=${encodeURIComponent(query)}`;
 }
 
-async function searchAwesomeLists(query: string, limit: number): Promise<string> {
+async function searchAwesomeLists(query: string, limit: number, github_token?: string): Promise<string> {
   const headers: Record<string, string> = {
     'Accept': 'application/vnd.github.v3+json',
     'User-Agent': 'CODE-RESEARCH-MCP-Server'
   };
 
-  const githubToken = process.env.GITHUB_TOKEN;
-  if (githubToken) {
-    headers['Authorization'] = `Bearer ${githubToken}`;
+  if (github_token) {
+    headers['Authorization'] = `Bearer ${github_token}`;
   }
 
   const response = await axios.get(
@@ -366,10 +409,9 @@ async function searchRedditProgramming(query: string, limit: number): Promise<st
   return results || 'No posts found';
 }
 
-async function searchYoutubeTutorials(query: string, limit: number): Promise<string> {
-  const youtubeApiKey = process.env.YOUTUBE_API_KEY;
-  if (!youtubeApiKey) {
-    return 'YouTube API key required. Set YOUTUBE_API_KEY environment variable.';
+async function searchYoutubeTutorials(query: string, limit: number, youtube_api_key?: string): Promise<string> {
+  if (!youtube_api_key) {
+    return 'YouTube API key required. Please provide youtube_api_key parameter.';
   }
 
   const response = await axios.get(
@@ -380,7 +422,7 @@ async function searchYoutubeTutorials(query: string, limit: number): Promise<str
         q: `${query} programming tutorial`,
         type: 'video',
         maxResults: limit,
-        key: youtubeApiKey,
+        key: youtube_api_key,
         videoEmbeddable: 'true',
         relevanceLanguage: 'en'
       },
